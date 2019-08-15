@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script>
+      //   let ws = new WebSocket("ws://localhost:8000");
+      let socket = io("http://localhost:8000");
+      console.log(socket);
+
+    //   ws.onopen = event => {
+    //     ws.send("I'm so exited I'm connected");
+    //   };
+     socket.on('connect',(data)=>{
+         console.log(data)
+       socket.on('welcome',(msg)=>{
+           console.log(msg)
+       });
+       socket.emit('message',{data:"I'm so exited I'm connected"})
+     }) 
+    //   ws.onmessage = msg => {
+    //     console.log(msg);
+    //   };
+
+    </script>
+  </body>
+</html>

@@ -1,6 +1,8 @@
 //namespaces
 const socket = io("http://localhost:3000");
-const socket2 = io("http://localhost:3000/admin");
+const socket2 = io("http://localhost:3000/wiki");
+const socket3 = io("http://localhost:3000/mozilla");
+const socket4 = io("http://localhost:3000/linux");
 console.log(socket.io)
 
 socket.on("messageFromServer", dataFromServer => {

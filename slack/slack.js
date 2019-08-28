@@ -2,14 +2,21 @@ const express= require('express');
 const socketio= require('socket.io');
 
 const app =express();
-app.use(express.static(__dirname + '/public'))
-
 const expressServer=app.listen(3000,()=>console.log('app listen to port 3000'))
+
 const io=socketio(expressServer,{
     path:'/socket.io',
     serveClient:true
 
 });
+
+let namespaces=require('./data/namespaces.js')
+// console.log(namespaces)
+
+
+app.use(express.static(__dirname + '/public'))
+
+
 // io.on e = na io.of('/').on
 io.on('connection',(socket)=>{
     socket.emit('messageFromServer',{data:'Welcome to socket.io Server'});
@@ -25,7 +32,10 @@ io.on('connection',(socket)=>{
     io.of('/').to('level1').emit('joined',`${socket.id} I have joined the level2 room`)
    
 })
-io.of('/admin').on('connection',(socket)=>{
-    io.of('/admin').emit('welcomeAdmin',{welcome:'Welcome to the admin chanel'})
-   console.log('Someone connected to the admin')
-})
+
+namespaces.forEach((n)=>{
+    io.of(n.endpoint).on('connection',(socket)=>{
+        console.log(`socket id from slack ${socket.id}`)
+    })
+ })
+ 

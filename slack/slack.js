@@ -1,41 +1,42 @@
-const express= require('express');
-const socketio= require('socket.io');
+const express = require("express");
+const socketio = require("socket.io");
 
-const app =express();
-const expressServer=app.listen(3000,()=>console.log('app listen to port 3000'))
+const app = express();
+const expressServer = app.listen(3000, () =>
+  console.log("app listen to port 3000")
+);
 
-const io=socketio(expressServer,{
-    path:'/socket.io',
-    serveClient:true
-
+const io = socketio(expressServer, {
+  path: "/socket.io",
+  serveClient: true
 });
 
-let namespaces=require('./data/namespaces.js')
+let namespaces = require("./data/namespaces.js");
 // console.log(namespaces)
 
-
-app.use(express.static(__dirname + '/public'))
-
+app.use(express.static(__dirname + "/public"));
 
 // io.on e = na io.of('/').on
-io.on('connection',(socket)=>{
-    socket.emit('messageFromServer',{data:'Welcome to socket.io Server'});
-    socket.on('dataToServer',(dataFromClient)=>{
-        console.log(dataFromClient)
-    })
-    socket.on('newMessageToServer',(msg)=>{
-        // console.log(msg)
-        io.emit('messageToClients',{text:msg.text})
-    })
-    socket.join('level1')
-    socket.to('level1').emit('joined',`${socket.id} I have joined the level1 room`)
-    io.of('/').to('level1').emit('joined',`${socket.id} I have joined the level2 room`)
-   
-})
+io.on("connection", socket => {
+  //    build an array to send back with the img and endpoint for each ns
+  let nsData = namespaces.map(ns => {
+    return {
+      img: ns.img,
+      endpoint: ns.endpoint
+    };
+  });
+//   console.log(nsData)
+//send the nsData back to the client
+//we need to use socket NOT io because we wanted it to go to just this client
+socket.emit('nsList',nsData)
+});
 
-namespaces.forEach((n)=>{
-    io.of(n.endpoint).on('connection',(socket)=>{
-        console.log(`socket id from slack ${socket.id}`)
-    })
- })
- 
+namespaces.forEach(namespace => {
+//   console.log(namespace);
+  io.of(namespace.endpoint).on("connection", nsSocket => {
+    console.log(`${nsSocket.id} has joined ${namespace.endpoint}`);
+    //a socket has connected to one of our chatgroup namespaces
+    //send that ns group info back
+    nsSocket.emit('nsRoomLoad',namespaces[0].rooms)
+  });
+});

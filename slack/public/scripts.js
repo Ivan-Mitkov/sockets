@@ -1,7 +1,7 @@
 //namespaces
 const socket = io("http://localhost:3000");
 
-console.log("from script.js", socket.io);
+
 
 //listen for nsList, which is a list of all namespaces
 socket.on("nsList", nsData => {
@@ -20,49 +20,8 @@ socket.on("nsList", nsData => {
       console.log(`${nsEndpoint} I should go now`);
     });
   });
-  const nsSocket = io("http://localhost:3000/wiki");
-  nsSocket.on("nsRoomLoad", nsRooms => {
-    // console.log(nsRooms)
-    let roomList = document.querySelector(".room-list");
-    roomList.innerHTML = "";
-   
+  joinNs('/wiki')
   
-    nsRooms.forEach(room => {
-      let gliph='';
-      if(room.privateRoom){
-        gliph='lock'
-      }else{
-        gliph='globe'
-      }
-      roomList.innerHTML += `<li class="room"><span class="glyphicon glyphicon-${gliph}"></span>${room.roomTitle}</li>`;
-    });
-    //add click listener to each room
-    let roomNodes=document.getElementsByClassName('room');
-    Array.from(roomNodes).forEach(elem=>{
-      elem.addEventListener('click',e=>{
-        console.log(`somone click on ${e.target.innerText}`)
-      })
-    })
-  });
 });
 
-socket.on("messageFromServer", dataFromServer => {
-  console.log("from script.js", dataFromServer);
-  socket.emit("dataToServer", { data: "Data from client" });
-});
 
-socket.on("joined", msg => {
-  console.log("from script.js", msg);
-});
-
-document.querySelector("#message-form").addEventListener("submit", event => {
-  event.preventDefault();
-  // console.log('form submitted')
-  const newMessage = document.querySelector("#user-message").value;
-  //   console.log(newMessage);
-  socket.emit("newMessageToServer", { text: newMessage });
-});
-socket.on("messageToClients", msg => {
-  console.log(msg);
-  document.querySelector("#messages").innerHTML += `<li>${msg.text}</li>`;
-});
